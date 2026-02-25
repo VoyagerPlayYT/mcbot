@@ -1,10 +1,10 @@
 {
-  "name": "gothbreach-bot-cluster",
+  "name": "gothbreach-raid-v2",
   "version": "1.0.1",
-  "description": "Minecraft Bot Cluster for MineBlaze",
-  "main": "multi_bot.js",
   "dependencies": {
-    "mineflayer": "^4.20.0"
+    "mineflayer": "^4.20.0",
+    "proxy-agent": "^6.3.1",
+    "axios": "^1.6.0"
   },
   "scripts": {
     "start": "node multi_bot.js"
