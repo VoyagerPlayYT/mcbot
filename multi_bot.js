@@ -1,5 +1,5 @@
 const mineflayer = require('mineflayer');
-const ProxyAgent = require('proxy-agent');
+const { ProxyAgent } = require('proxy-agent'); // Изменено здесь
 const axios = require('axios');
 
 const HOST = 'mc.mineblaze.ru';
@@ -8,16 +8,14 @@ const BOT_COUNT = 100;
 
 let proxyList = [];
 
-// Функция загрузки бесплатных прокси
 async function updateProxies() {
     try {
-        console.log('--- Загрузка списка прокси... ---');
-        // Берем прокси из открытого источника (SOCKS5 и HTTP)
+        console.log('--- Обновление списка прокси... ---');
         const response = await axios.get('https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=10000&country=all&ssl=all&anonymity=all');
-        proxyList = response.data.split('\r\n').filter(p => p.length > 0);
-        console.log(`--- Загружено ${proxyList.length} прокси ---`);
+        proxyList = response.data.split('\r\n').filter(p => p.trim().length > 0);
+        console.log(`--- Готово. Доступно: ${proxyList.length} ---`);
     } catch (err) {
-        console.log('Ошибка загрузки прокси, пробуем зайти напрямую...');
+        console.log('Ошибка загрузки прокси.');
     }
 }
 
@@ -28,52 +26,51 @@ function generateName() {
 }
 
 async function createBot(id) {
-    // Берем случайную проксю из списка
     const proxyRaw = proxyList[Math.floor(Math.random() * proxyList.length)];
-    const proxyUrl = proxyRaw ? `http://${proxyRaw}` : null;
+    // В новых версиях proxy-agent используется просто строка прокси
+    const agent = proxyRaw ? new ProxyAgent(`http://${proxyRaw}`) : null;
 
     const bot = mineflayer.createBot({
         host: HOST,
         username: generateName(),
         version: VERSION,
-        agent: proxyUrl ? new ProxyAgent(proxyUrl) : null,
-        connectTimeout: 15000
+        agent: agent, // Теперь передаем корректный объект
+        connectTimeout: 20000
     });
 
     bot.once('spawn', async () => {
-        console.log(`[${bot.username}] Прорвался через прокси ${proxyRaw || 'Direct'}`);
+        console.log(`[${bot.username}] Зашел!`);
         
-        await new Promise(r => setTimeout(r, 3000));
+        await new Promise(r => setTimeout(r, 4000));
         bot.chat('/reg 12345678 12345678');
         
         await new Promise(r => setTimeout(r, 5000));
-        bot.chat('/s1');
+        bot.chat('/s4');
 
-        // Цикл спама
         setInterval(() => {
             if (bot.entity) {
-                bot.chat('тест тест тест тест');
+                // Добавляем рандомный хвост, чтобы антиспам не палил
+                const randomTail = Math.random().toString(36).substring(7);
+                bot.chat(`тест тест тест тест [${randomTail}]`);
             }
-        }, 5000 + (Math.random() * 3000));
+        }, 6000 + (Math.random() * 4000));
     });
 
-    // Если прокся плохая или кикнули — берем новую и перезаходим
-    bot.on('error', () => {}); 
+    bot.on('error', (err) => {
+        // console.log(`[Ошибка] ${err.message}`);
+    }); 
+
     bot.on('end', () => {
-        setTimeout(() => createBot(id), 10000);
+        setTimeout(() => createBot(id), 15000);
     });
 }
 
-// Главная функция
 (async () => {
     await updateProxies();
-    
-    // Обновляем список прокси каждые 15 минут
-    setInterval(updateProxies, 15 * 60 * 1000);
+    setInterval(updateProxies, 10 * 60 * 1000);
 
     for (let i = 0; i < BOT_COUNT; i++) {
         createBot(i);
-        // Задержка между попытками захода
-        await new Promise(r => setTimeout(r, 5000));
+        await new Promise(r => setTimeout(r, 6000)); // Большая задержка для Render
     }
 })();
