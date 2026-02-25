@@ -33,7 +33,7 @@ function createBot(id) {
         bot.chat('/reg 12345678 12345678');
         
         await new Promise(r => setTimeout(r, 5000));
-        bot.chat('/s4');
+        bot.chat('/s1');
         
         // Интервал спама
         setInterval(() => {
