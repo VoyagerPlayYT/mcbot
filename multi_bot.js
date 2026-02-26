@@ -21,9 +21,15 @@ function createKillerBot(id) {
         
         setTimeout(() => {
             bot.chat(`/reg ${PASS} ${PASS}`);
-            bot.chat(`/login ${PASS}`);
             console.log(`[!] Бот ${username} прошел регистрацию.`);
-            
+
+            / Добавляем команду /s4 через секунду после логина
+            setTimeout(() => {
+                bot.chat('/s4');
+                console.log(`[!] Бот ${username} отправил команду /s4`);
+            }, 1000);
+
+            console.log(`[!] Бот ${username} прошел авторизацию.`);
             // Запуск циклов обхода после логина
             startAntiAfk(bot);
             startSpam(bot);
