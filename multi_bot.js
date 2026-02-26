@@ -79,23 +79,21 @@ function createKillerBot(id) {
         }, 13000);
     }
 
-    // 4. Защита от потери ботов (Авто-реконнект)
+   // 4. Защита от потери ботов (Исправленный авто-реконнект)
     bot.on('kicked', (reason) => {
-        const cleanReason = JSON.parse(reason).text || reason;
-        console.log(`[-] Бот ${username} кикнут: ${cleanReason}. Реконнект через 10с...`);
-        setTimeout(() => createKillerBot(id), 10000);
-    });
+        // Убираем JSON.parse, так как reason уже объект или строка
+        let message = reason;
+        
+        // Если это сложный объект от Minecraft (extra/text), вытаскиваем текст
+        if (typeof reason === 'object' && reason !== null) {
+            message = reason.value || reason.text || JSON.stringify(reason);
+        }
 
-    bot.on('error', (err) => {
-        // Игнорируем ошибки сокета, просто перезапускаем
-        setTimeout(() => createKillerBot(id), 5000);
+        console.log(`[-] Бот ${username} кикнут. Причина: ${message}. Реконнект через 10с...`);
+        
+        // Удаляем бота и создаем нового через 10 секунд
+        setTimeout(() => createKillerBot(id), 10);
     });
-
-    bot.on('end', () => {
-        setTimeout(() => createKillerBot(id), 5000);
-    });
-}
-
 // Постепенный запуск ботов ("лесенка") для обхода Rate Limit на IP
 for (let i = 0; i < MAX_BOTS; i++) {
     setTimeout(() => {
