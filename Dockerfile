@@ -9,7 +9,7 @@ COPY package.json ./
 RUN npm install --production
 
 # Копируем основной код скрипта
-COPY ..
+COPY multi_bot.js ./
 
 # Команда для запуска атаки при старте контейнера
 CMD [ "node", "index.js" ]
