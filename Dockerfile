@@ -2,7 +2,6 @@
 FROM node:18-alpine
 
 # Создаем рабочую директорию внутри контейнера
-WORKDIR /usr/src/app
 
 # Копируем package.json и устанавливаем зависимости
 COPY package.json ./
