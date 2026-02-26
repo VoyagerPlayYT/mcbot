@@ -1,10 +1,7 @@
-FROM node:20-alpine
-
-WORKDIR /app
-
-COPY package.json .
+FROM node:18-slim
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN apt-get update && apt-get install -y python3 make g++
 RUN npm install
-
-COPY index.js .
-
-CMD ["node", "index.js"]
+COPY . .
+CMD ["npm", "start"]
