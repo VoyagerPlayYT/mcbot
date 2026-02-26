@@ -9,7 +9,7 @@ COPY package.json ./
 RUN npm install --production
 
 # Копируем основной код скрипта
-COPY index.js ./
+COPY ..
 
 # Команда для запуска атаки при старте контейнера
 CMD [ "node", "index.js" ]
