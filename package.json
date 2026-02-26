@@ -1,14 +1,15 @@
 {
-  "name": "pvp-bots",
+  "name": "mc-destroyer-pro",
   "version": "1.0.0",
-  "description": "Mineflayer PvP bots",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
-  },
+  "main": "attack.js",
   "dependencies": {
-    "mineflayer": "^4.14.0",
-    "mineflayer-pvp": "^1.3.2",
-    "mineflayer-armor-manager": "^2.0.1"
+    "mineflayer": "^4.8.0",
+    "proxy-chain": "^0.22.4",
+    "chalk": "^4.1.2",
+    "node-os-utils": "^1.3.7",
+    "dotenv": "^16.0.3"
+  },
+  "scripts": {
+    "start": "node attack.js"
   }
 }
