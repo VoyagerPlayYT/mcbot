@@ -1,12 +1,14 @@
 {
-  "name": "gothbreach-raid-v2",
-  "version": "1.0.1",
-  "dependencies": {
-    "mineflayer": "^4.20.0",
-    "proxy-agent": "^6.3.1",
-    "axios": "^1.6.0"
-  },
+  "name": "pvp-bots",
+  "version": "1.0.0",
+  "description": "Mineflayer PvP bots",
+  "main": "index.js",
   "scripts": {
-    "start": "node multi_bot.js"
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "mineflayer": "^4.14.0",
+    "mineflayer-pvp": "^1.3.2",
+    "mineflayer-armor-manager": "^2.0.1"
   }
 }
