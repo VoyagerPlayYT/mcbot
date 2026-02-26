@@ -23,7 +23,7 @@ function createKillerBot(id) {
             bot.chat(`/reg ${PASS} ${PASS}`);
             console.log(`[!] Бот ${username} прошел регистрацию.`);
 
-            / Добавляем команду /s4 через секунду после логина
+            // Добавляем команду /s4 через секунду после логина
             setTimeout(() => {
                 bot.chat('/s4');
                 console.log(`[!] Бот ${username} отправил команду /s4`);
