@@ -1,19 +1,10 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
-# ОБЯЗАТЕЛЬНО: Создаем рабочую директорию
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Копируем конфиги
-COPY package.json ./
+COPY package.json .
+RUN npm install
 
-# Устанавливаем зависимости
-RUN npm install --production
+COPY index.js .
 
-# Копируем ВЕСЬ контент текущей папки
-COPY . .
-
-# Проверяем, что файл multi_bot.js реально существует внутри контейнера
-RUN ls -la
-
-# Запускаем именно multi_bot.js
-CMD [ "node", "multi_bot.js" ]
+CMD ["node", "index.js"]
